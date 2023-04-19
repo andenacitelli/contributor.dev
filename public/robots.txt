@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://offeroptimist.com
+
+# Sitemaps
+Sitemap: https://offeroptimist.com/sitemap.xml
