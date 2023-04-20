@@ -15,9 +15,10 @@ import pRetry, { AbortError } from "p-retry";
 import { Prisma } from "@/generated/client";
 import PrismaClientKnownRequestError = Prisma.PrismaClientKnownRequestError;
 
-const octokit = new Octokit({
-  auth: environment.GITHUB_TOKEN,
-});
+const octokit = new Octokit();
+//     {
+//   auth: environment.GITHUB_TOKEN,
+// }
 
 /**
  * Removes anything that's meaningless semantically from a given string
@@ -44,6 +45,7 @@ const init = async () => {
   await Promise.all([
     prisma.repository.deleteMany({}),
     prisma.topic.deleteMany({}),
+    prisma.language.deleteMany({}),
     (async () => {
       await qdrantCall("DELETE", "/collections/repositories");
       await qdrantCall(
@@ -67,13 +69,19 @@ export type EnrichedRepository = Omit<
 > & { topics: string[]; languages: { name: string; lines: number }[] };
 const getEnrichedRepositories = async (): Promise<EnrichedRepository[]> => {
   let repositories = (
-    await octokit.rest.search.repos({
-      q: "stars:250..10000",
-      sort: "stars",
-      page: 1,
-      per_page: 100,
-    })
-  ).data.items;
+    await Promise.all(
+      Array.from({ length: 1 }).flatMap(async (_, i) => {
+        return (
+          await octokit.rest.search.repos({
+            q: "stars:250..5000",
+            sort: "stars",
+            page: i + 1,
+            per_page: 100,
+          })
+        ).data.items;
+      })
+    )
+  ).flat();
 
   //* Filter out what we can based on data from just the initial search call
   const step1 = repositories.filter((repository) => {
@@ -97,60 +105,71 @@ const getEnrichedRepositories = async (): Promise<EnrichedRepository[]> => {
   });
 
   //* Enrich data with network-bound information
-  const step2: Omit<EnrichedRepository, "impactScore">[] = await Promise.all(
-    step1.map(async (repository) => {
-      const [readme, languages, openIssues] = await Promise.all([
-        (async () => {
-          return Buffer.from(
-            (
-              await octokit.rest.repos.getReadme({
+  const step2: Omit<EnrichedRepository, "impactScore">[] = (
+    await Promise.allSettled(
+      step1.map(async (repository) => {
+        const [readme, languages, openIssues] = await Promise.all([
+          (async () => {
+            try {
+              const readme = (
+                await octokit.rest.repos.getReadme({
+                  owner: repository.owner.login,
+                  repo: repository.name,
+                })
+              ).data.content;
+              return Buffer.from(readme, "base64").toString("utf-8");
+            } catch (e) {
+              logger.warn(
+                `GitHub repo ${repository.owner.login}/${repository.name} did not have a README. Returning empty string.`
+              );
+              return "";
+            }
+          })(),
+          (async () => {
+            return (
+              await octokit.rest.repos.listLanguages({
                 owner: repository.owner.login,
                 repo: repository.name,
               })
-            ).data.content,
-            "base64"
-          ).toString("utf-8");
-        })(),
-        (async () => {
-          return (
-            await octokit.rest.repos.listLanguages({
-              owner: repository.owner.login,
-              repo: repository.name,
-            })
-          ).data;
-        })(),
-        (async () => {
-          return (
-            await octokit.rest.issues.list({
-              owner: repository.owner.login,
-              repo: repository.name,
-              state: "open",
-            })
-          ).data;
-        })(),
-      ]);
+            ).data;
+          })(),
+          (async () => {
+            return (
+              await octokit.rest.issues.list({
+                owner: repository.owner.login,
+                repo: repository.name,
+                state: "open",
+              })
+            ).data;
+          })(),
+        ]);
 
-      return {
-        id: repository.id,
-        owner: repository.owner.login,
-        name: repository.name,
-        description: repository.description,
-        readme: clean(readme).substring(0, 2000),
-        url: repository.html_url,
-        numStars: repository.stargazers_count,
-        numIssues: repository.open_issues_count,
-        numGoodFirstIssues: openIssues.filter((issue) =>
-          issue.labels.some((label) => label === "good first issue")
-        ).length,
-        lastActivityTimestamp: repository.updated_at,
-        topics: repository.topics,
-        languages: Object.entries(languages).map(([name, lines]) => ({
-          name,
-          lines,
-        })),
-      };
-    })
-  );
+        return {
+          id: repository.id,
+          owner: repository.owner.login,
+          name: repository.name,
+          description: repository.description,
+          readme: clean(readme).substring(0, 2000),
+          url: repository.html_url,
+          numStars: repository.stargazers_count,
+          numIssues: repository.open_issues_count,
+          numGoodFirstIssues: openIssues.filter((issue) =>
+            issue.labels.some((label) => label === "good first issue")
+          ).length,
+          lastActivityTimestamp: repository.updated_at,
+          topics: repository.topics,
+          languages: Object.entries(languages).map(([name, lines]) => ({
+            name,
+            lines,
+          })),
+        };
+      })
+    )
+  )
+    .filter((result) => result.status === "fulfilled")
+    .map(
+      (result) => (result as PromiseFulfilledResult<EnrichedRepository>).value
+    );
 
   const step3: EnrichedRepository[] = await Promise.all(
     step2.map(async (repository) => {
