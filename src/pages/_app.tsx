@@ -74,50 +74,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                     PROJECT_CONFIG.shortDescription}
                 </title>
               </Head>
-
-              <AppShell
-                padding={0}
-                header={
-                  <Header height={{ base: 50 }} p="md">
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        height: "100%",
-                      }}
-                    >
-                      <MediaQuery largerThan="md" styles={{ display: "none" }}>
-                        <Burger
-                          opened={opened}
-                          onClick={() => setOpened((o) => !o)}
-                          size="sm"
-                          color={theme.colors.gray[6]}
-                          mr="xl"
-                        />
-                      </MediaQuery>
-                      <Link
-                        href={"/"}
-                        style={{ textDecoration: "none", color: "white" }}
-                      >
-                        <Group spacing={"xs"}>
-                          <IconApiApp />
-                          <Text>contributor.dev</Text>
-                        </Group>
-                      </Link>
-                    </div>
-                  </Header>
-                }
-                styles={(theme) => ({
-                  main: {
-                    backgroundColor:
-                      theme.colorScheme === "dark"
-                        ? theme.colors.dark[8]
-                        : theme.colors.gray[0],
-                  },
-                })}
-              >
-                <Component {...pageProperties} />
-              </AppShell>
+              <Component {...pageProperties} />
             </Box>
           </QueryClientProvider>
         </MantineProvider>

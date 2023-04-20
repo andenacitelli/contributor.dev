@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { Prisma } from "@/generated/client";
 import SortOrder = Prisma.SortOrder;
 import { z } from "zod";
-import { SupportedSorts, SupportedSortsEnum } from "@/utils/enums";
+import { QdrantSchemas, SupportedSorts, SupportedSortsEnum } from "@/utils/zod";
 import { GptClient } from "@/server/gpt";
 import { qdrantCall } from "@/server/qdrant";
 import { logger } from "@/server/logger";
@@ -28,31 +28,16 @@ const procedures = {
     if (input.prompt) {
       // Interfacing with the chatbot!
       const embedding = await GptClient.getEmbedding(input.prompt);
-      const closestVectors = (await qdrantCall(
-        "POST",
-        "/collections/repositories/points/search",
-        {
+      const closestVectors = QdrantSchemas.SearchPointsOutputSchema.parse(
+        await qdrantCall("POST", "/collections/repositories/points/search", {
           vector: embedding,
           limit: 5,
-        }
-      )) as {
-        time: number;
-        status: "ok";
-        result: {
-          id: number;
-          version: number;
-          score: number;
-          payload: {
-            id: string;
-          };
-          vector: number[];
-        }[];
-      };
-      logger.info(`Found ${JSON.stringify(closestVectors)}`);
+        })
+      );
       return prisma.repository.findMany({
         where: {
           id: {
-            in: closestVectors.result.map((result) => result.payload.id),
+            in: closestVectors.result.map((result) => result.id),
           },
         },
         include: {
@@ -67,12 +52,10 @@ const procedures = {
           name: {
             contains: input.name ?? "",
           },
-          language: {
-            in: input.languages ?? [],
-          },
         },
         include: {
           topics: true,
+          languages: true,
         },
         orderBy: getOrderBy(input.sort),
         skip: (input.page - 1) * PAGE_SIZE,
@@ -81,7 +64,7 @@ const procedures = {
     }
   }),
   findById: procedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ id: z.number().int() }))
     .query(async ({ input }) => {
       return prisma.repository.findUnique({
         where: {

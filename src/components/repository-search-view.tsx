@@ -3,7 +3,7 @@ import { UseFormReturnType } from "@mantine/form";
 import { Box, Button, Stack, Textarea, TextInput } from "@mantine/core";
 import { CustomMultiSelect } from "@/components/custom-multi-select";
 import { z } from "zod";
-import { SupportedLanguagesEnum } from "@/utils/enums";
+import { SupportedLanguagesEnum } from "@/utils/zod";
 import { api } from "@/client/trpc/api";
 
 export const RepositorySearchView = ({

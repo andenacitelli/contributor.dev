@@ -22,23 +22,37 @@ model CacheEntry {
 }
 
 model Repository {
-  id          String @id @db.VarChar(100) /// z.string().regex(/^.*\/.*$/)
-  owner       String @db.VarChar(100)
-  name        String @db.VarChar(100)
-  description String @db.VarChar(500)
-  readme      String @db.VarChar(2000)
-  language    String @db.VarChar(100)
+  // Corresponds to GitHub's id; necessary to keep as linkage to Qdrant
+  id          Int    @id /// z.number().int().min(0) 
+  owner       String @db.VarChar(100) /// z.string().min(1).max(100)
+  name        String @db.VarChar(100) /// z.string().min(1).max(100)
+  description String @db.VarChar(500) /// z.string().min(0).max(500)
+  readme      String @db.VarChar(2000) /// z.string().min(0).max(2000)
 
-  url       String  @db.VarChar(256) /// z.string().url()
-  numStars  Int /// z.number().int().positive()
-  numIssues Int /// z.number().int().positive()
-  topics    Topic[]
+  url                   String     @db.VarChar(256) /// z.string().url()
+  impactScore           Float /// z.number().float().positive().min(0).max(1)
+  numStars              Int /// z.number().int().positive().min(0)
+  numIssues             Int /// z.number().int().positive().min(0)
+  numGoodFirstIssues    Int /// z.number().int().positive().min(0)
+  lastActivityTimestamp DateTime /// z.date().min(new Date(2000, 1, 1))
+  topics                Topic[]
+  languages             Language[]
 
   updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Topic {
-  name         String       @id @db.VarChar(100)
+  name         String       @id @db.VarChar(100) /// z.string().min(1).max(100)
   updatedAt    DateTime     @default(now()) @updatedAt
   repositories Repository[]
+}
+
+model Language {
+  id           String     @id @default(uuid()) /// z.number().int().min(0)
+  name         String     @db.VarChar(100) /// z.string().min(1).max(100)
+  lines        Int /// z.number().int().positive().min(0)
+  Repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  repositoryId Int
+
+  @@index([repositoryId], name: "repositoryId")
 }

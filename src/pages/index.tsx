@@ -6,7 +6,9 @@ import {
   Container,
   Grid,
   Group,
+  Loader,
   Pagination,
+  Skeleton,
   Stack,
   Text,
   Title,
@@ -17,14 +19,17 @@ import {
   IconInfoCircle,
   IconHammer,
   IconApiApp,
+  IconClick,
+  IconQuestionMark,
+  IconBrandGithub,
 } from "@tabler/icons-react";
 import { RepositorySearchView } from "@/components/repository-search-view";
 import { z } from "zod";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api } from "@/client/trpc/api";
 import { RepositoryView } from "@/components/repository-view";
 import { useForm } from "@mantine/form";
-import { SupportedSortsEnum, SupportedLanguagesEnum } from "@/utils/enums";
+import { SupportedSortsEnum, SupportedLanguagesEnum } from "@/utils/zod";
 
 export const FiltersSchema = z.object({
   prompt: z.string().max(512).optional(),
@@ -48,6 +53,9 @@ const Home: NextPage = () => {
   });
 
   const findRepositoriesMutation = api.repositories.findAll.useMutation();
+  useEffect(() => {
+    findRepositoriesMutation.mutate(form.values);
+  }, []);
   const repositories = useMemo(
     () => findRepositoriesMutation.data ?? [],
     [findRepositoriesMutation]
@@ -64,10 +72,7 @@ const Home: NextPage = () => {
   };
 
   return (
-    <Grid
-      m={0}
-      sx={{ height: "calc(100vh - 50px)", maxHeight: "calc(100vh - 50px)" }}
-    >
+    <Grid m={0} sx={{ height: "100vh", maxHeight: "100vh" }}>
       <Grid.Col
         md={3}
         sm={4}
@@ -79,24 +84,20 @@ const Home: NextPage = () => {
             <IconApiApp />
             <Title order={5}>contributor.dev</Title>
           </Group>
-          <Text size={"sm"}>
-            Our goal is to make it extremely easy to contribute to open source.
-            We're open source ourselves - check us out{" "}
-            <Anchor href={"https://github.com/aacitelli/contributor.dev"}>
-              on GitHub
-            </Anchor>
-            !
-          </Text>
           <Button onClick={() => findRepositoriesMutation.mutate(form.values)}>
-            Find Repositories
+            <Group>
+              <IconClick />
+              <Text>Update Search</Text>
+              {findRepositoriesMutation.isLoading && <Loader />}
+            </Group>
           </Button>
           <RepositorySearchView form={form} />
         </Stack>
       </Grid.Col>
       <Grid.Col
         sx={{
-          height: "calc(100vh - 50px)",
-          maxHeight: "calc(100vh - 50px)",
+          height: "100vh",
+          maxHeight: "100vh",
           overflowY: "auto",
         }}
         md={9}
@@ -105,16 +106,47 @@ const Home: NextPage = () => {
       >
         <Container size={"lg"}>
           <Stack>
-            <Title order={3}>Repositories</Title>
-            <PaginationComponent />
             <Alert
-              color={"yellow"}
-              icon={<IconHammer />}
-              title={"Under Construction"}
+              title={"We help you find open source projects to contribute to."}
+              color="gray"
+              icon={<IconQuestionMark />}
             >
-              We're currently building the site out. Check back in a week or
-              two!
+              <Stack>
+                <Text size={"sm"}>
+                  Our goal is to make it extremely easy to contribute to open
+                  source, with the end goal of enabling people to fix society's
+                  biggest issues. Our focus is on repositories with
+                  philanthropic applications that are still maturing. Our
+                  "impact score" is a measure of how much impact you will have
+                  contributing to any given repository.
+                </Text>
+                <Text>
+                  We're open source ourselves and welcome contributions!
+                </Text>
+                <Anchor
+                  href={"https://github.com/aacitelli/contributor.dev"}
+                  target={"_blank"}
+                >
+                  <Button
+                    size={"xs"}
+                    variant="gradient"
+                    gradient={{ from: "#343434", to: "#232323" }}
+                    color={"black"}
+                  >
+                    <Group>
+                      <IconBrandGithub size={16} />
+                      <Text>GitHub Repo</Text>
+                    </Group>
+                  </Button>
+                </Anchor>
+              </Stack>
             </Alert>
+            <Title order={3}>Repositories</Title>
+            {findRepositoriesMutation.isLoading &&
+              Array.from({ length: 10 }).map((_, i) => (
+                <Skeleton key={i} height={100} />
+              ))}
+            <PaginationComponent />
             {repositories.map((repository) => (
               <RepositoryView key={repository.id} repository={repository} />
             ))}

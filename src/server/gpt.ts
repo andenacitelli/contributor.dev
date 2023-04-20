@@ -56,6 +56,7 @@ export class BaseGptCaller {
             }
           );
           const output = completion.data.choices[0]!.message!.content as string;
+          logger.info("Output: " + output);
           if (validated.schema) validated.schema.parse(output);
           return output;
         } catch (error) {
@@ -65,7 +66,7 @@ export class BaseGptCaller {
             ${(error as ZodError).issues
               .map((issue) => issue.message)
               .join("\n")}
-            Prompt: ${prompt}
+            Prompt: ${prompt.substring(0, 100)}...
             Retrying...\n`
             );
             if (process.env.NODE_ENV === "development")
@@ -102,7 +103,7 @@ export class BaseGptCaller {
               input: text,
             },
             {
-              timeout: 10_000,
+              timeout: 5_000,
             }
           );
           return response.data.data[0]!.embedding;
