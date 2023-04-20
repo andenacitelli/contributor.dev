@@ -4,7 +4,6 @@ import { getServerSession, type Session } from "next-auth";
 import superjson from "superjson";
 
 import { PrismaClient } from "@/generated/client";
-import { DEFAULT_FORM_VALUES } from "@/pages";
 
 import { prisma } from "../database";
 

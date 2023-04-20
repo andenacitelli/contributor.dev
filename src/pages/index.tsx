@@ -22,6 +22,8 @@ import {
   IconClick,
   IconQuestionMark,
   IconBrandGithub,
+  IconHeartHandshake,
+  IconBrain,
 } from "@tabler/icons-react";
 import { RepositorySearchView } from "@/components/repository-search-view";
 import { z } from "zod";
@@ -84,13 +86,45 @@ const Home: NextPage = () => {
             <IconApiApp />
             <Title order={5}>contributor.dev</Title>
           </Group>
-          <Button onClick={() => findRepositoriesMutation.mutate(form.values)}>
-            <Group>
-              <IconClick />
-              <Text>Update Search</Text>
-              {findRepositoriesMutation.isLoading && <Loader />}
-            </Group>
-          </Button>
+          <Title order={5}>We help you contribute to open source.</Title>
+          <Text size={"sm"}>
+            We measure the potential impact of repositories and use GPT and
+            Vector Search to get you personalized recommendations.
+          </Text>
+          <Group>
+            <Anchor
+              href={"https://github.com/aacitelli/contributor.dev"}
+              target={"_blank"}
+            >
+              <Button
+                size={"xs"}
+                variant="gradient"
+                gradient={{ from: "#343434", to: "#232323" }}
+              >
+                <Group>
+                  <IconBrandGithub size={16} />
+                  <Text>GitHub Repo</Text>
+                </Group>
+              </Button>
+            </Anchor>
+            <Anchor
+              href={
+                "https://aacitelli.notion.site/Technical-Deep-Dive-dd8af3d49c0c450d9ee03c7f7621bc92"
+              }
+              target={"_blank"}
+            >
+              <Button size={"xs"} variant={"outline"}>
+                <Group>
+                  <IconBrain size={16} />
+                  <Text>Technical Writeup</Text>
+                </Group>
+              </Button>
+            </Anchor>
+          </Group>
+          <Box>
+            <hr />
+          </Box>
+
           <RepositorySearchView form={form} />
         </Stack>
       </Grid.Col>
@@ -106,42 +140,16 @@ const Home: NextPage = () => {
       >
         <Container size={"lg"}>
           <Stack>
-            <Alert
-              title={"We help you find open source projects to contribute to."}
-              color="gray"
-              icon={<IconQuestionMark />}
-            >
-              <Stack>
-                <Text size={"sm"}>
-                  Our goal is to make it extremely easy to contribute to open
-                  source, with the end goal of enabling people to fix society's
-                  biggest issues. Our focus is on repositories with
-                  philanthropic applications that are still maturing. Our
-                  "impact score" is a measure of how much impact you will have
-                  contributing to any given repository.
-                </Text>
-                <Text>
-                  We're open source ourselves and welcome contributions!
-                </Text>
-                <Anchor
-                  href={"https://github.com/aacitelli/contributor.dev"}
-                  target={"_blank"}
-                >
-                  <Button
-                    size={"xs"}
-                    variant="gradient"
-                    gradient={{ from: "#343434", to: "#232323" }}
-                    color={"black"}
-                  >
-                    <Group>
-                      <IconBrandGithub size={16} />
-                      <Text>GitHub Repo</Text>
-                    </Group>
-                  </Button>
-                </Anchor>
-              </Stack>
-            </Alert>
             <Title order={3}>Repositories</Title>
+            <Button
+              onClick={() => findRepositoriesMutation.mutate(form.values)}
+            >
+              <Group>
+                <IconClick />
+                <Text>Search</Text>
+                {findRepositoriesMutation.isLoading && <Loader />}
+              </Group>
+            </Button>
             {findRepositoriesMutation.isLoading &&
               Array.from({ length: 10 }).map((_, i) => (
                 <Skeleton key={i} height={100} />

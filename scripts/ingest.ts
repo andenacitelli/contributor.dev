@@ -1,5 +1,4 @@
 import { Octokit } from "octokit";
-import { environment } from "@/env/server.mjs";
 import { prisma } from "@/server/database";
 import { logger } from "@/server/logger";
 import { GptClient } from "@/server/gpt";

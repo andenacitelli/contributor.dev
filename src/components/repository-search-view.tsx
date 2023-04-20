@@ -1,6 +1,6 @@
 import { Filters } from "@/pages";
 import { UseFormReturnType } from "@mantine/form";
-import { Box, Button, Stack, Textarea, TextInput } from "@mantine/core";
+import { Box, Button, Stack, Textarea, TextInput, Title } from "@mantine/core";
 import { CustomMultiSelect } from "@/components/custom-multi-select";
 import { z } from "zod";
 import { SupportedLanguagesEnum } from "@/utils/zod";
@@ -13,6 +13,7 @@ export const RepositorySearchView = ({
 }) => {
   return (
     <Stack>
+      <Title order={5}>Filters</Title>
       <Textarea
         {...form.getInputProps("prompt")}
         label="Prompt"
