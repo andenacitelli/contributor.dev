@@ -2,18 +2,29 @@ import { Octokit } from "octokit";
 import { environment } from "@/env/server.mjs";
 import { prisma } from "@/server/database";
 import { logger } from "@/server/logger";
+import { GptClient } from "@/server/gpt";
+import { qdrantCall } from "@/server/qdrant";
+
+import { createHash } from "crypto";
+
+function hash(string) {
+  return createHash("sha256").update(string).digest("hex");
+}
 
 const octokit = new Octokit({
   auth: environment.GITHUB_TOKEN,
 });
 
 const main = async () => {
-  const repositories = await octokit.rest.search.repos({
-    q: "stars:>0",
-    sort: "stars",
-    page: 1,
-    per_page: 100,
-  });
+  const [repositories, _] = await Promise.all([
+    octokit.rest.search.repos({
+      q: "stars:>0",
+      sort: "stars",
+      page: 1,
+      per_page: 100,
+    }),
+    prisma.repository.deleteMany({}),
+  ]);
 
   await Promise.all(
     repositories.data.items.map(async (repository) => {
@@ -50,13 +61,28 @@ const main = async () => {
       };
 
       try {
-        await prisma.repository.upsert({
-          where: {
-            id: data.id,
-          },
-          create: data,
-          update: data,
-        });
+        await Promise.all([
+          prisma.repository.upsert({
+            where: {
+              id: data.id,
+            },
+            create: data,
+            update: data,
+          }),
+          Promise.all(
+            repository.topics.map(async (topic) => {
+              await prisma.topic.upsert({
+                where: {
+                  name: topic,
+                },
+                create: {
+                  name: topic,
+                },
+                update: {},
+              });
+            })
+          ),
+        ]);
       } catch (e) {
         logger.error(
           `Error ingesting repository ${data.id} with data ${JSON.stringify({
@@ -66,6 +92,28 @@ const main = async () => {
         );
         throw e;
       }
+
+      const prompt = `
+        Name: ${data.name}
+        Owner: ${data.owner}
+        Description: ${data.description}
+        URL: ${data.url}
+        readme: ${cleanedReadme.substring(0, 1000)}
+        language: ${data.language ?? "None"}
+            `;
+
+      const embedding = await GptClient.getEmbedding(prompt);
+
+      // TODO: Much more efficient to batch these all at once near the end, rather than 100 separate ones
+      await qdrantCall("PUT", "/collections/repositories/points", {
+        batch: {
+          ids: [Math.floor(Math.random() * 1000000000)], // TODO: Hacky
+          vectors: [embedding],
+          payload: {
+            id: data.id,
+          },
+        },
+      });
     })
   );
 

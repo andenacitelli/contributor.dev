@@ -1,6 +1,7 @@
 // Generic cache class for compressing and storing data in the database. If readability is important, don't use this.
 
 import * as zlib from "node:zlib";
+import { logger } from "@/server/logger";
 
 type CacheEntry = {
   key: string;
@@ -21,7 +22,7 @@ export const getCache = async (
 ): Promise<string | undefined> => {
   const entry = (await prisma.cacheEntry.findUnique({
     where: {
-      key,
+      key: key.substring(0, 512),
     },
     select: {
       value: true,
@@ -34,7 +35,9 @@ export const getCache = async (
     return undefined;
   }
 
-  return zlib.inflateSync(Buffer.from(entry.value, "base64")).toString();
+  return zlib
+    .inflateSync(Buffer.from(entry.value, "base64"), { level: 9 })
+    .toString();
 };
 
 export const setCache = async (
@@ -42,16 +45,16 @@ export const setCache = async (
   key: string,
   data: string
 ): Promise<void> => {
-  const value = zlib.deflateSync(data).toString("base64");
+  const value = zlib.deflateSync(data, { level: 9 }).toString("base64");
   await prisma.cacheEntry.upsert({
     where: {
-      key,
+      key: key.substring(0, 512),
     },
     update: {
       value,
     },
     create: {
-      key,
+      key: key.substring(0, 512),
       value,
     },
   });

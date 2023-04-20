@@ -23,6 +23,8 @@ export const serverSchema = z.object({
   DATABASE_URL: z.string().url(),
   GITHUB_TOKEN: z.string().min(1),
   OPENAI_API_KEY: z.string().min(1),
+  QDRANT_HOST: z.string().url(),
+  QDRANT_API_KEY: z.string().min(1),
 });
 
 /**
@@ -39,6 +41,8 @@ export const serverEnvironment = {
   DATABASE_URL: process.env.DATABASE_URL,
   GITHUB_TOKEN: process.env.GITHUB_TOKEN,
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  QDRANT_HOST: process.env.QDRANT_HOST,
+  QDRANT_API_KEY: process.env.QDRANT_API_KEY,
 };
 
 /**

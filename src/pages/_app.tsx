@@ -1,8 +1,19 @@
-import { Box } from "@mantine/core";
+import {
+  Anchor,
+  AppShell,
+  Box,
+  Burger,
+  Group,
+  Header,
+  MediaQuery,
+  Navbar,
+  Title,
+  Text,
+  useMantineTheme,
+} from "@mantine/core";
 import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
-import { Shell } from "@packages/ui/src/shell";
-import { IconCards, IconSearch } from "@tabler/icons-react";
+import { IconApiApp, IconCards, IconSearch } from "@tabler/icons-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type AppType } from "next/app";
 import Head from "next/head";
@@ -11,7 +22,9 @@ import { SessionProvider } from "next-auth/react";
 import PlausibleProvider from "next-plausible";
 
 import { PROJECT_CONFIG } from "@/config";
-import { api } from "@/utils/api";
+import { api } from "@/client/trpc/api";
+import Link from "next/link";
+import { useState } from "react";
 
 const navbarLinkGroups = [
   [
@@ -26,6 +39,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProperties },
 }) => {
+  const [opened, setOpened] = useState(false);
+  const theme = useMantineTheme();
   return (
     <SessionProvider session={session}>
       <PlausibleProvider domain={PROJECT_CONFIG.domain}>
@@ -52,21 +67,57 @@ const MyApp: AppType<{ session: Session | null }> = ({
           <Notifications />
           <QueryClientProvider client={queryClient}>
             <Box sx={{ position: "relative" }}>
-              <Shell
-                projectConfig={PROJECT_CONFIG}
-                navbarLinkGroups={navbarLinkGroups}
-                icon={<IconCards />}
-              >
-                <Head>
-                  <title>
-                    {PROJECT_CONFIG.name +
-                      " - " +
-                      PROJECT_CONFIG.shortDescription}
-                  </title>
-                </Head>
+              <Head>
+                <title>
+                  {PROJECT_CONFIG.name +
+                    " - " +
+                    PROJECT_CONFIG.shortDescription}
+                </title>
+              </Head>
 
+              <AppShell
+                padding={0}
+                header={
+                  <Header height={{ base: 50 }} p="md">
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        height: "100%",
+                      }}
+                    >
+                      <MediaQuery largerThan="md" styles={{ display: "none" }}>
+                        <Burger
+                          opened={opened}
+                          onClick={() => setOpened((o) => !o)}
+                          size="sm"
+                          color={theme.colors.gray[6]}
+                          mr="xl"
+                        />
+                      </MediaQuery>
+                      <Link
+                        href={"/"}
+                        style={{ textDecoration: "none", color: "white" }}
+                      >
+                        <Group spacing={"xs"}>
+                          <IconApiApp />
+                          <Text>contributor.dev</Text>
+                        </Group>
+                      </Link>
+                    </div>
+                  </Header>
+                }
+                styles={(theme) => ({
+                  main: {
+                    backgroundColor:
+                      theme.colorScheme === "dark"
+                        ? theme.colors.dark[8]
+                        : theme.colors.gray[0],
+                  },
+                })}
+              >
                 <Component {...pageProperties} />
-              </Shell>
+              </AppShell>
             </Box>
           </QueryClientProvider>
         </MantineProvider>

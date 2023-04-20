@@ -16,8 +16,8 @@ datasource db {
 }
 
 model CacheEntry {
-  key       String   @id @map("_id")
-  value     String
+  key       String   @id @db.VarChar(512)
+  value     String   @db.LongText
   updatedAt DateTime @updatedAt
 }
 
@@ -33,9 +33,12 @@ model Repository {
   numStars  Int /// z.number().int().positive()
   numIssues Int /// z.number().int().positive()
   topics    Topic[]
+
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Topic {
   name         String       @id @db.VarChar(100)
+  updatedAt    DateTime     @default(now()) @updatedAt
   repositories Repository[]
 }

@@ -4,6 +4,7 @@ import { z, ZodError } from "zod";
 
 import { getCache, setCache } from "./cache";
 import { logger } from "./logger";
+import { prisma } from "@/server/database";
 
 const configuration = new Configuration({
   organization: "org-AyhdgS08Dl3T4zVyowGqiCFD",
@@ -13,6 +14,7 @@ const openai = new OpenAIApi(configuration);
 
 export const MODELS = {
   STANDARD: "gpt-3.5-turbo",
+  EMBEDDING: "text-embedding-ada-002",
 };
 
 const GptCallOptionsSchema = z.object({
@@ -89,4 +91,31 @@ export class BaseGptCaller {
     logger.debug(`GPT Call returned ${text}`);
     return text;
   }
+
+  async getEmbedding(text: string): Promise<number[]> {
+    const call = async () => {
+      return await pRetry(async () => {
+        try {
+          const response = await openai.createEmbedding(
+            {
+              model: MODELS.EMBEDDING,
+              input: text,
+            },
+            {
+              timeout: 10_000,
+            }
+          );
+          return response.data.data[0]!.embedding;
+        } catch (error) {
+          if (error instanceof Error) {
+            logger.error(error.message!);
+          }
+          throw error;
+        }
+      });
+    };
+    return await call();
+  }
 }
+
+export const GptClient = new BaseGptCaller(prisma);
