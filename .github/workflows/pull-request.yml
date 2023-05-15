@@ -1,0 +1,21 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test-contributor:
+    defaults:
+      run:
+        working-directory: apps/contributor.dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          cache: npm
+      - run: npm ci
+      - run: npm run test:unit
+      - run: npm run test:e2e
