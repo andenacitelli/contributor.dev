@@ -25,12 +25,15 @@
     "@mantine/notifications": "^6.0.11",
     "@pinecone-database/pinecone": "^0.1.6",
     "@prisma/client": "^4.14.1",
+    "@t3-oss/env-nextjs": "^0.3.1",
     "@tabler/icons-react": "^2.20.0",
     "@tanstack/react-query": "^4.29.7",
     "@trpc/client": "^10.27.1",
     "@trpc/next": "^10.27.1",
     "@trpc/react-query": "^10.27.1",
     "@trpc/server": "^10.27.1",
+    "@vercel/analytics": "^1.0.0",
+    "@vercel/postgres": "^0.3.0",
     "date-fns": "^2.30.0",
     "next": "13.4.3",
     "nextjs-cors": "^2.1.2",
@@ -41,6 +44,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-query": "^3.39.3",
+    "superjson": "^1.12.3",
     "zod": "3.21.1"
   },
   "devDependencies": {

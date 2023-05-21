@@ -1,13 +1,8 @@
-import {Octokit} from "octokit";
-import {z} from "zod";
+import { EnrichedRepository } from "scripts/ingest";
+import { z } from "zod";
 
-import {Prisma} from "@/generated/client";
-import {GptClient} from "@/server/gpt";
-import {EnrichedRepository} from "scripts/ingest";
-
-import {logger} from "@/server/logger";
-
-const octokit = new Octokit();
+import { GptClient } from "@/server/gpt";
+import { logger } from "@/server/logger";
 
 export const getImpactScore = async (
   repository: Omit<EnrichedRepository, "impactScore">
@@ -24,7 +19,6 @@ export const getImpactScore = async (
         0,
         1000
       )}
-      languages: ${repository.languages.map((l) => l.name).join(",")}
       # of stars: ${repository.numStars}
       # of open issues: ${repository.numIssues}
       

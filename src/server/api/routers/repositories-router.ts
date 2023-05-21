@@ -1,21 +1,20 @@
-import {TRPCError} from "@trpc/server";
+import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 
-import {Prisma} from "@/generated/client";
-import {FiltersSchema} from "@/pages";
-import {createTRPCRouter, procedure} from "@/server/trpc/trpc";
+import { Prisma } from "@/generated/client";
+import { FiltersSchema } from "@/pages";
+import { GptClient } from "@/server/gpt";
+import { qdrantCall } from "@/server/qdrant";
+import { createTRPCRouter, procedure } from "@/server/trpc/trpc";
+import { QdrantSchemas, SupportedSorts, SupportedSortsEnum } from "@/utils/zod";
 
-import {prisma} from "../../database";
-import {z} from "zod";
-
-import {GptClient} from "@/server/gpt";
-import {qdrantCall} from "@/server/qdrant";
-import {QdrantSchemas, SupportedSorts, SupportedSortsEnum} from "@/utils/zod";
+import { prisma } from "../../database";
 import SortOrder = Prisma.SortOrder;
 
 const getOrderBy = (sort: SupportedSorts) => {
-    switch (sort) {
-        case SupportedSortsEnum.enum.STARS: {
-            return {numStars: SortOrder.desc};
+  switch (sort) {
+    case SupportedSortsEnum.enum.STARS: {
+      return { numStars: SortOrder.desc };
     }
     default: {
       throw new TRPCError({
@@ -58,7 +57,6 @@ const procedures = {
         },
         include: {
           topics: true,
-          languages: true,
         },
         orderBy: getOrderBy(input.sort),
         skip: (input.page - 1) * PAGE_SIZE,

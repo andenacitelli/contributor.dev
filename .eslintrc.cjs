@@ -2,12 +2,12 @@ const { defineConfig } = require("eslint-define-config");
 
 module.exports = defineConfig(
     {
+        root: true,
+        parser: "@typescript-eslint/parser",
         extends: [
-            "eslint:recommended",
             "plugin:@typescript-eslint/recommended",
             "next/core-web-vitals"
         ],
-        parser: "@typescript-eslint/parser",
         parserOptions: {
             ecmaVersion: "latest",
             sourceType: "module",
@@ -27,4 +27,10 @@ module.exports = defineConfig(
             "unused-imports/no-unused-imports": "error",
             "unused-imports/no-unused-vars": ["error", {argsIgnorePattern: "^_"}],
         },
+        ignorePatterns: [
+            "**/dist/**",
+            "**/node_modules/**",
+            ".eslintrc.cjs",
+            "**/config.*",
+        ],
     });

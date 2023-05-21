@@ -12,20 +12,25 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import {useForm} from "@mantine/form";
-import {IconApiApp, IconBrain, IconBrandGithub, IconClick,} from "@tabler/icons-react";
-import {NextPage} from "next";
-import {useEffect, useMemo} from "react";
-import {z} from "zod";
+import { useForm } from "@mantine/form";
+import {
+  IconApiApp,
+  IconBrain,
+  IconBrandGithub,
+  IconClick,
+} from "@tabler/icons-react";
+import { NextPage } from "next";
+import { useEffect, useMemo } from "react";
+import { z } from "zod";
 
-import {api} from "@/client/trpc/api";
-import {RepositorySearchView} from "@/components/repository-search-view";
-import {RepositoryView} from "@/components/repository-view";
-import {SupportedLanguagesEnum, SupportedSortsEnum} from "@/utils/zod";
+import { api } from "@/client/trpc/api";
+import { RepositorySearchView } from "@/components/repository-search-view";
+import { RepositoryView } from "@/components/repository-view";
+import { SupportedLanguagesEnum, SupportedSortsEnum } from "@/utils/zod";
 
 export const FiltersSchema = z.object({
-    prompt: z.string().max(512).optional(),
-    sort: SupportedSortsEnum,
+  prompt: z.string().max(512).optional(),
+  sort: SupportedSortsEnum,
   name: z.string(),
   languages: z.array(SupportedLanguagesEnum),
   page: z.number().int().min(1),
@@ -47,7 +52,7 @@ const Home: NextPage = () => {
   const findRepositoriesMutation = api.repositories.findAll.useMutation();
   useEffect(() => {
     findRepositoriesMutation.mutate(form.values);
-  }, []);
+  }, [findRepositoriesMutation, form.values]);
   const repositories = useMemo(
     () => findRepositoriesMutation.data ?? [],
     [findRepositoriesMutation]

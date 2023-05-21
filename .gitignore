@@ -1,9 +1,9 @@
-**/node_modules/
-**/.env
+node_modules/
+.env
 
-.idea/
+.idea/workspace.xml
 .vscode/
 .next/
 .turbo/
+.vercel/
 generated/
-.vercel

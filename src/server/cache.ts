@@ -2,12 +2,10 @@
 
 import * as zlib from "node:zlib";
 
+import { PrismaClient } from "@prisma/client";
 
-type CacheEntry = {
-  key: string;
-  value: string;
-  updatedAt: Date;
-};
+import { CacheEntry } from "../../prisma/generated/zod";
+
 export const TTL = {
   MINUTE: 60,
   HOUR: 60 * 60,
@@ -16,7 +14,7 @@ export const TTL = {
   MONTH: 60 * 60 * 24 * 30,
 };
 export const getCache = async (
-  prisma: any,
+  prisma: PrismaClient,
   key: string,
   ttlSeconds: number = TTL.HOUR // Daily
 ): Promise<string | undefined> => {
@@ -41,7 +39,7 @@ export const getCache = async (
 };
 
 export const setCache = async (
-  prisma: any,
+  prisma: PrismaClient,
   key: string,
   data: string
 ): Promise<void> => {
