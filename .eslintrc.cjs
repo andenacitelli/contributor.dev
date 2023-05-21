@@ -5,9 +5,6 @@ module.exports = defineConfig(
         extends: [
             "eslint:recommended",
             "plugin:@typescript-eslint/recommended",
-            "plugin:prettier/recommended",
-            "plugin:unicorn/recommended",
-            "next",
             "next/core-web-vitals"
         ],
         parser: "@typescript-eslint/parser",
@@ -17,19 +14,9 @@ module.exports = defineConfig(
         },
         plugins: ["@typescript-eslint", "unused-imports", "simple-import-sort"],
         rules: {
-            'prettier/prettier': [
-                'error',
-                {
-                    'endOfLine': 'auto',
-                }
-            ],
-
             // Temporary disables
-            "unicorn/prefer-logical-operator-over-ternary": "warn",
-            "unicorn/no-array-reduce": "warn",
-            "unicorn/no-nested-ternary": "warn",
             "@typescript-eslint/ban-ts-comment": "warn",
-            "react/no-unescaped-entities": "off",
+            "react/no-unescaped-entities": "warn",
 
             // simple-import-sort
             "simple-import-sort/imports": "error",
@@ -38,6 +25,6 @@ module.exports = defineConfig(
             // unused-imports
             "@typescript-eslint/no-unused-vars": "off",
             "unused-imports/no-unused-imports": "error",
-            "unused-imports/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+            "unused-imports/no-unused-vars": ["error", {argsIgnorePattern: "^_"}],
         },
     });

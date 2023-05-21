@@ -1,12 +1,8 @@
-import { Repository } from "@/generated/client";
-import { Anchor, Badge, Button, Card, Group, Text, Title } from "@mantine/core";
-import {
-  IconBrandGithub,
-  IconBrandTypescript,
-  IconStar,
-} from "@tabler/icons-react";
-import { RouterOutputs } from "@/client/trpc/api";
-import { languageIconMap } from "@/components/language-icon-map";
+import {Anchor, Button, Card, Group, Text, Title} from "@mantine/core";
+import {IconBrandGithub, IconStar,} from "@tabler/icons-react";
+
+import {RouterOutputs} from "@/client/trpc/api";
+import {languageIconMap} from "@/components/language-icon-map";
 
 export const RepositoryView = ({
   repository,

@@ -1,18 +1,21 @@
-import { prisma } from "../../database";
-import { createTRPCRouter, procedure } from "@/server/trpc/trpc";
-import { FiltersSchema } from "@/pages";
-import { TRPCError } from "@trpc/server";
-import { Prisma } from "@/generated/client";
+import {TRPCError} from "@trpc/server";
+
+import {Prisma} from "@/generated/client";
+import {FiltersSchema} from "@/pages";
+import {createTRPCRouter, procedure} from "@/server/trpc/trpc";
+
+import {prisma} from "../../database";
+import {z} from "zod";
+
+import {GptClient} from "@/server/gpt";
+import {qdrantCall} from "@/server/qdrant";
+import {QdrantSchemas, SupportedSorts, SupportedSortsEnum} from "@/utils/zod";
 import SortOrder = Prisma.SortOrder;
-import { z } from "zod";
-import { QdrantSchemas, SupportedSorts, SupportedSortsEnum } from "@/utils/zod";
-import { GptClient } from "@/server/gpt";
-import { qdrantCall } from "@/server/qdrant";
-import { logger } from "@/server/logger";
+
 const getOrderBy = (sort: SupportedSorts) => {
-  switch (sort) {
-    case SupportedSortsEnum.enum.STARS: {
-      return { numStars: SortOrder.desc };
+    switch (sort) {
+        case SupportedSortsEnum.enum.STARS: {
+            return {numStars: SortOrder.desc};
     }
     default: {
       throw new TRPCError({

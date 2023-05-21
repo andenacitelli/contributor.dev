@@ -1,19 +1,19 @@
-import { Filters } from "@/pages";
-import { UseFormReturnType } from "@mantine/form";
-import { Box, Button, Stack, Textarea, TextInput, Title } from "@mantine/core";
-import { CustomMultiSelect } from "@/components/custom-multi-select";
-import { z } from "zod";
-import { SupportedLanguagesEnum } from "@/utils/zod";
-import { api } from "@/client/trpc/api";
+import {Stack, Textarea, TextInput, Title} from "@mantine/core";
+import {UseFormReturnType} from "@mantine/form";
+import {z} from "zod";
+
+import {CustomMultiSelect} from "@/components/custom-multi-select";
+import {Filters} from "@/pages";
+import {SupportedLanguagesEnum} from "@/utils/zod";
 
 export const RepositorySearchView = ({
-  form,
-}: {
-  form: UseFormReturnType<Filters>;
+                                         form,
+                                     }: {
+    form: UseFormReturnType<Filters>;
 }) => {
-  return (
-    <Stack>
-      <Title order={5}>Filters</Title>
+    return (
+        <Stack>
+            <Title order={5}>Filters</Title>
       <Textarea
         {...form.getInputProps("prompt")}
         label="Prompt"

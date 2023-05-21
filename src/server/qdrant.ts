@@ -1,5 +1,6 @@
-import { z } from "zod";
-import { environment } from "@/env/server.mjs";
+import {z} from "zod";
+
+import {environment} from "@/env/server.mjs";
 
 export const qdrantCall = async (method: string, path: string, body?: any) => {
   z.enum(["GET", "POST", "PUT", "DELETE"]).parse(method);

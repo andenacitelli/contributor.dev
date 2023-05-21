@@ -1,7 +1,7 @@
 // Generic cache class for compressing and storing data in the database. If readability is important, don't use this.
 
 import * as zlib from "node:zlib";
-import { logger } from "@/server/logger";
+
 
 type CacheEntry = {
   key: string;

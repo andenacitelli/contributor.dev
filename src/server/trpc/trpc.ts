@@ -1,11 +1,14 @@
-import { initTRPC, TRPCError } from "@trpc/server";
-import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { getServerSession, type Session } from "next-auth";
+import {initTRPC} from "@trpc/server";
+import {type CreateNextContextOptions} from "@trpc/server/adapters/next";
+import {getServerSession, NextAuthOptions, type Session} from "next-auth";
 import superjson from "superjson";
 
-import { PrismaClient } from "@/generated/client";
+import {PrismaClient} from "@/generated/client";
 
-import { prisma } from "../database";
+import {prisma} from "../database";
+import GoogleProvider from "next-auth/providers/google";
+
+import {environment} from "@/env/server.mjs";
 
 type CreateContextOptions = {
   session: Session | null;
@@ -18,10 +21,6 @@ const createInnerTRPCContext = (options: CreateContextOptions) => {
     prisma,
   };
 };
-
-import { NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import { environment } from "@/env/server.mjs";
 
 const genericNextAuthOptions: NextAuthOptions = {
   providers: [

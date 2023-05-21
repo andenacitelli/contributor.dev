@@ -1,11 +1,12 @@
-import { Octokit } from "octokit";
-import { z } from "zod";
-import { GptClient } from "@/server/gpt";
-import { RepositoryCreateInputSchema } from "@/generated/zod";
-import { Prisma } from "@/generated/client";
-import RepositoryCreateInput = Prisma.RepositoryCreateInput;
-import { EnrichedRepository } from "scripts/ingest";
-import { logger } from "@/server/logger";
+import {Octokit} from "octokit";
+import {z} from "zod";
+
+import {Prisma} from "@/generated/client";
+import {GptClient} from "@/server/gpt";
+import {EnrichedRepository} from "scripts/ingest";
+
+import {logger} from "@/server/logger";
+
 const octokit = new Octokit();
 
 export const getImpactScore = async (

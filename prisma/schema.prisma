@@ -1,23 +1,19 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/client"
 }
 
 generator zod {
-  provider         = "zod-prisma-types"
-  output           = "../generated/zod"
-  prismaClientPath = "../client"
+  provider = "zod-prisma-types"
 }
 
 datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model CacheEntry {
   key       String   @id @db.VarChar(512)
-  value     String   @db.LongText
+  value     String
   updatedAt DateTime @updatedAt
 }
 

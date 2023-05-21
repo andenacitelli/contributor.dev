@@ -1,36 +1,22 @@
-import {
-  Anchor,
-  AppShell,
-  Box,
-  Burger,
-  Group,
-  Header,
-  MediaQuery,
-  Navbar,
-  Title,
-  Text,
-  useMantineTheme,
-} from "@mantine/core";
-import { MantineProvider } from "@mantine/core";
-import { Notifications } from "@mantine/notifications";
-import { IconApiApp, IconCards, IconSearch } from "@tabler/icons-react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { type AppType } from "next/app";
+import {Box, MantineProvider, useMantineTheme,} from "@mantine/core";
+import {Notifications} from "@mantine/notifications";
+import {IconCards, IconSearch} from "@tabler/icons-react";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {type AppType} from "next/app";
 import Head from "next/head";
-import { type Session } from "next-auth";
-import { SessionProvider } from "next-auth/react";
+import {type Session} from "next-auth";
+import {SessionProvider} from "next-auth/react";
 import PlausibleProvider from "next-plausible";
+import {useState} from "react";
 
-import { PROJECT_CONFIG } from "@/config";
-import { api } from "@/client/trpc/api";
-import Link from "next/link";
-import { useState } from "react";
+import {api} from "@/client/trpc/api";
+import {PROJECT_CONFIG} from "@/config";
 
 const navbarLinkGroups = [
-  [
-    { icon: <IconSearch size={18} />, label: "Search Cards", link: "/" },
-    { icon: <IconCards size={18} />, label: "My Cards", link: "/me" },
-  ],
+    [
+        {icon: <IconSearch size={18}/>, label: "Search Cards", link: "/"},
+        {icon: <IconCards size={18}/>, label: "My Cards", link: "/me"},
+    ],
 ];
 
 export const queryClient = new QueryClient();
