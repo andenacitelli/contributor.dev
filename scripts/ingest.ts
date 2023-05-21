@@ -41,8 +41,6 @@ const init = async () => {
   logger.info("Deleting existing data...");
   await Promise.all([
     prisma.repository.deleteMany({}),
-    prisma.topic.deleteMany({}),
-    prisma.language.deleteMany({}),
     (async () => {
       await qdrantCall("DELETE", "/collections/repositories");
       await qdrantCall(

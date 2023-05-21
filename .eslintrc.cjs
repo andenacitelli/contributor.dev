@@ -12,20 +12,11 @@ module.exports = defineConfig(
             ecmaVersion: "latest",
             sourceType: "module",
         },
-        plugins: ["@typescript-eslint", "unused-imports", "simple-import-sort"],
+        plugins: ["@typescript-eslint"],
         rules: {
             // Temporary disables
             "@typescript-eslint/ban-ts-comment": "warn",
             "react/no-unescaped-entities": "warn",
-
-            // simple-import-sort
-            "simple-import-sort/imports": "error",
-            "simple-import-sort/exports": "error",
-
-            // unused-imports
-            "@typescript-eslint/no-unused-vars": "off",
-            "unused-imports/no-unused-imports": "error",
-            "unused-imports/no-unused-vars": ["error", {argsIgnorePattern: "^_"}],
         },
         ignorePatterns: [
             "**/dist/**",

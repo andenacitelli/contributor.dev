@@ -1,7 +1,7 @@
+import { SortOrderSchema } from "@prisma/client/zod";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { Prisma } from "@/generated/client";
 import { FiltersSchema } from "@/pages";
 import { GptClient } from "@/server/gpt";
 import { qdrantCall } from "@/server/qdrant";
@@ -9,12 +9,11 @@ import { createTRPCRouter, procedure } from "@/server/trpc/trpc";
 import { QdrantSchemas, SupportedSorts, SupportedSortsEnum } from "@/utils/zod";
 
 import { prisma } from "../../database";
-import SortOrder = Prisma.SortOrder;
 
 const getOrderBy = (sort: SupportedSorts) => {
   switch (sort) {
     case SupportedSortsEnum.enum.STARS: {
-      return { numStars: SortOrder.desc };
+      return { numStars: SortOrderSchema.enum.desc };
     }
     default: {
       throw new TRPCError({
@@ -42,9 +41,6 @@ const procedures = {
             in: closestVectors.result.map((result) => result.id),
           },
         },
-        include: {
-          topics: true,
-        },
       });
     } else {
       // General case
@@ -54,9 +50,6 @@ const procedures = {
           name: {
             contains: input.name ?? "",
           },
-        },
-        include: {
-          topics: true,
         },
         orderBy: getOrderBy(input.sort),
         skip: (input.page - 1) * PAGE_SIZE,
@@ -70,9 +63,6 @@ const procedures = {
       return prisma.repository.findUnique({
         where: {
           id: input.id,
-        },
-        include: {
-          topics: true,
         },
       });
     }),
