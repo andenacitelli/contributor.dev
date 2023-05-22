@@ -3,9 +3,11 @@ node_modules/
 
 .cache/
 !.cache/README.md
+.generated/
+!.generated/README.md
+
 .idea/workspace.xml
 .vscode/
 .next/
 .turbo/
 .vercel/
-generated/

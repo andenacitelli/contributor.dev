@@ -21,6 +21,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
+      "@generated/*": [
+        ".generated/*"
+      ]
     }
   },
   "ts-node": {

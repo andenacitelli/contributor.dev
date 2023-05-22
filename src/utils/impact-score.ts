@@ -1,8 +1,8 @@
 import { EnrichedRepository } from "scripts/ingest";
 import { z } from "zod";
 
-import { GptClient } from "@/server/gpt";
 import { logger } from "@/server/logger";
+import { CompletionsService } from "@/server/remote/openai/completions/service";
 
 export const getImpactScore = async (
   repository: Omit<EnrichedRepository, "impactScore">
@@ -54,9 +54,6 @@ export const getImpactScore = async (
     return parsed;
   });
 
-  const response = await GptClient.request(prompt, {
-    schema: NumberSchema,
-  });
-
+  const response = await CompletionsService.get(prompt);
   return NumberSchema.parse(response);
 };
