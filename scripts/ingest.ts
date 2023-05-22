@@ -1,23 +1,22 @@
-import { Octokit } from "octokit";
-import { prisma } from "@/server/database";
-import { logger } from "@/server/logger";
-import { GptClient } from "@/server/gpt";
-import { qdrantCall } from "@/server/qdrant";
-
-import { QdrantSchemas } from "@/utils/zod";
-import { z } from "zod";
-import { RepositoryCreateInputSchema } from "@/generated/zod";
-import { Pagination } from "@mantine/core";
-import { getImpactScore } from "@/utils/impact-score";
+import { Prisma } from "@prisma/client";
+import { RepositoryCreateInputSchema } from "@prisma/client/zod";
 import * as fs from "fs";
+import { Octokit } from "octokit";
 import pRetry, { AbortError } from "p-retry";
-import { Prisma } from "@/generated/client";
-import PrismaClientKnownRequestError = Prisma.PrismaClientKnownRequestError;
+import { z } from "zod";
 
-const octokit = new Octokit();
-//     {
-//   auth: environment.GITHUB_TOKEN,
-// }
+import { prisma } from "@/server/remote/db/database";
+import { GptClient } from "@/server/gpt";
+import { logger } from "@/server/logger";
+import { qdrantCall } from "@/server/qdrant";
+import { getImpactScore } from "@/utils/impact-score";
+import { QdrantSchemas } from "@/utils/zod";
+import PrismaClientKnownRequestError = Prisma.PrismaClientKnownRequestError;
+import { environment } from "@/environment";
+
+const octokit = new Octokit({
+  auth: environment.GITHUB_TOKEN,
+});
 
 /**
  * Removes anything that's meaningless semantically from a given string
@@ -43,8 +42,6 @@ const init = async () => {
   logger.info("Deleting existing data...");
   await Promise.all([
     prisma.repository.deleteMany({}),
-    prisma.topic.deleteMany({}),
-    prisma.language.deleteMany({}),
     (async () => {
       await qdrantCall("DELETE", "/collections/repositories");
       await qdrantCall(
@@ -65,9 +62,9 @@ const init = async () => {
 export type EnrichedRepository = Omit<
   z.infer<typeof RepositoryCreateInputSchema>,
   "topics" | "languages"
-> & { topics: string[]; languages: { name: string; lines: number }[] };
+> & { topics: string[] };
 const getEnrichedRepositories = async (): Promise<EnrichedRepository[]> => {
-  let repositories = (
+  const repositories = (
     await Promise.all(
       Array.from({ length: 1 }).flatMap(async (_, i) => {
         return (
@@ -299,7 +296,7 @@ const planetscale = async (
 };
 
 const qdrant = async (repositories: EnrichedRepository[]): Promise<void> => {
-  let embeddings: { id: number; vector: number[]; payload?: any }[] =
+  const embeddings: { id: number; vector: number[]; payload? }[] =
     await Promise.all(
       repositories.map(async (repository) => {
         const prompt = `

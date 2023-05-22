@@ -1,8 +1,13 @@
-**/node_modules/
-**/.env
+node_modules/
+.env
 
-.idea/
+.cache/
+!.cache/README.md
+.generated/
+!.generated/README.md
+
+.idea/workspace.xml
 .vscode/
 .next/
 .turbo/
-generated/
+.vercel/

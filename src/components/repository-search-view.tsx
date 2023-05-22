@@ -1,10 +1,7 @@
-import { Filters } from "@/pages";
+import { Stack, Textarea, TextInput, Title } from "@mantine/core";
 import { UseFormReturnType } from "@mantine/form";
-import { Box, Button, Stack, Textarea, TextInput, Title } from "@mantine/core";
-import { CustomMultiSelect } from "@/components/custom-multi-select";
-import { z } from "zod";
-import { SupportedLanguagesEnum } from "@/utils/zod";
-import { api } from "@/client/trpc/api";
+
+import { Filters } from "@/pages";
 
 export const RepositorySearchView = ({
   form,
@@ -25,17 +22,6 @@ export const RepositorySearchView = ({
         {...form.getInputProps("name")}
         label="Filter by Name"
         description={"Only repositories with matching names will be shown."}
-      />
-      <CustomMultiSelect
-        get={() => form.values.languages}
-        set={(v) => {
-          form.setValues({
-            ...form.values,
-            languages: z.array(SupportedLanguagesEnum).parse(v),
-          });
-        }}
-        defaultValue={Object.values(SupportedLanguagesEnum._def.values)}
-        label={"Filter by Language"}
       />
     </Stack>
   );

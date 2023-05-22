@@ -1,12 +1,8 @@
-import { Octokit } from "octokit";
-import { z } from "zod";
-import { GptClient } from "@/server/gpt";
-import { RepositoryCreateInputSchema } from "@/generated/zod";
-import { Prisma } from "@/generated/client";
-import RepositoryCreateInput = Prisma.RepositoryCreateInput;
 import { EnrichedRepository } from "scripts/ingest";
+import { z } from "zod";
+
 import { logger } from "@/server/logger";
-const octokit = new Octokit();
+import { CompletionsService } from "@/server/remote/openai/completions/service";
 
 export const getImpactScore = async (
   repository: Omit<EnrichedRepository, "impactScore">
@@ -23,7 +19,6 @@ export const getImpactScore = async (
         0,
         1000
       )}
-      languages: ${repository.languages.map((l) => l.name).join(",")}
       # of stars: ${repository.numStars}
       # of open issues: ${repository.numIssues}
       
@@ -59,9 +54,6 @@ export const getImpactScore = async (
     return parsed;
   });
 
-  const response = await GptClient.request(prompt, {
-    schema: NumberSchema,
-  });
-
+  const response = await CompletionsService.get(prompt);
   return NumberSchema.parse(response);
 };

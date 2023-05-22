@@ -10,7 +10,8 @@ import {
   IconLetterC,
   IconList,
 } from "@tabler/icons-react";
-import { SupportedLanguagesEnum } from "@/utils/zod";
+
+import {SupportedLanguagesEnum} from "@/utils/zod";
 
 export const languageIconMap = {
   [SupportedLanguagesEnum.enum.TypeScript]: (

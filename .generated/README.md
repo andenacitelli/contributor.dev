@@ -1,0 +1,2 @@
+Placeholder directory for any downloaded or generated data that we want to cache in the filesystem. This file is mostly
+here just so Git adds the directory to the repository and we don't have to do any weird `mkdirp` stuff.
