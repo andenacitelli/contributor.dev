@@ -12,6 +12,7 @@ export const environment = createEnv({
     POSTGRES_URL: z.string().url(),
     OPENAI_API_KEY: z.string().min(1),
     PINECONE_API_KEY: z.string().min(1),
+    PINECONE_ENVIRONMENT: z.string().min(1),
     GITHUB_TOKEN: z.string().min(1),
   },
   /*
@@ -31,6 +32,7 @@ export const environment = createEnv({
     POSTGRES_URL: process.env.POSTGRES_URL,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     PINECONE_API_KEY: process.env.PINECONE_API_KEY,
+    PINECONE_ENVIRONMENT: process.env.PINECONE_ENVIRONMENT,
     GITHUB_TOKEN: process.env.GITHUB_TOKEN,
   },
 });
