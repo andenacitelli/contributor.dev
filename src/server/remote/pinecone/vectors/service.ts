@@ -4,26 +4,31 @@ import {
 } from "@/server/remote/pinecone/instance";
 import { ScoredVector, Vector } from "@pinecone-database/pinecone";
 import { z } from "zod";
-import { environment } from "@/environment";
 
-const pinecone = await getPineconeClient();
-const index = pinecone.Index(
-  `${REPOSITORIES_COLLECTION_NAME}-${environment.NODE_ENV}`
-);
+const getIndex = async () => {
+  const pinecone = await getPineconeClient();
+  return pinecone.Index(REPOSITORIES_COLLECTION_NAME);
+};
 
-const QueryOptionsSchema = z.object({
-  topK: z.number().int().min(1).default(10),
-});
+const QueryOptionsSchema = z
+  .object({
+    topK: z.number().int().min(1).default(10),
+  })
+  .default({
+    topK: 10,
+  });
 export type QueryOptions = z.infer<typeof QueryOptionsSchema>;
 
 export const VectorsService = {
   query: async (
-    vector: Vector,
-    options: QueryOptions
+    vector: number[],
+    options?: QueryOptions
   ): Promise<ScoredVector[]> => {
+    if (!options) options = QueryOptionsSchema.parse({});
+    const index = await getIndex();
     const response = await index.query({
       queryRequest: {
-        vector: vector.values,
+        vector,
         topK: options.topK,
       },
     });
@@ -31,6 +36,7 @@ export const VectorsService = {
   },
 
   addVectors: async (vectors: Vector[]): Promise<void> => {
+    const index = await getIndex();
     await index.upsert({
       upsertRequest: {
         vectors,

@@ -6,7 +6,7 @@ const assertStringIsValid = (s: string) => {
   expect(s.length).toBeGreaterThan(0);
 };
 describe("Positive Scenarios", () => {
-  it("Generic", async () => {
+  test.concurrent("Generic", async () => {
     assertStringIsValid(await CompletionsService.get("Hello!"));
   });
 });

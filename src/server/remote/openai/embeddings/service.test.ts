@@ -7,7 +7,7 @@ const assertEmbeddingIsValid = (embedding: number[]) => {
 };
 
 describe("Positive Scenarios", () => {
-  it("Generic", async () => {
+  test.concurrent("Generic", async () => {
     assertEmbeddingIsValid(await EmbeddingsService.get("Hello World"));
   });
 });
