@@ -5,13 +5,14 @@ import { Octokit } from "octokit";
 import pRetry, { AbortError } from "p-retry";
 import { z } from "zod";
 
-import { prisma } from "@/server/database";
+import { prisma } from "@/server/remote/db/database";
 import { GptClient } from "@/server/gpt";
 import { logger } from "@/server/logger";
 import { qdrantCall } from "@/server/qdrant";
 import { getImpactScore } from "@/utils/impact-score";
 import { QdrantSchemas } from "@/utils/zod";
 import PrismaClientKnownRequestError = Prisma.PrismaClientKnownRequestError;
+import { environment } from "@/environment";
 
 const octokit = new Octokit({
   auth: environment.GITHUB_TOKEN,

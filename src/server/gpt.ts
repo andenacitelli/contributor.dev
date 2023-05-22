@@ -1,15 +1,15 @@
-import {Configuration, OpenAIApi} from "openai";
-import pRetry, {AbortError} from "p-retry";
-import {z, ZodError} from "zod";
+import { Configuration, OpenAIApi } from "openai";
+import pRetry, { AbortError } from "p-retry";
+import { z, ZodError } from "zod";
 
-import {prisma} from "@/server/database";
+import { prisma } from "@/server/remote/db/database";
 
-import {getCache, setCache} from "./cache";
-import {logger} from "./logger";
+import { getCache, setCache } from "./cache";
+import { logger } from "./logger";
 
 const configuration = new Configuration({
-    organization: "org-AyhdgS08Dl3T4zVyowGqiCFD",
-    apiKey: process.env.OPENAI_API_KEY,
+  organization: "org-AyhdgS08Dl3T4zVyowGqiCFD",
+  apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
 

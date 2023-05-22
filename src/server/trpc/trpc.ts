@@ -1,7 +1,7 @@
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 
-import { prisma } from "../database";
+import { prisma } from "../remote/db/database";
 
 export const createTRPCContext = async () => {
   return { prisma };

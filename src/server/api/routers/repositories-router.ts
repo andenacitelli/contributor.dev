@@ -8,7 +8,7 @@ import { qdrantCall } from "@/server/qdrant";
 import { createTRPCRouter, procedure } from "@/server/trpc/trpc";
 import { QdrantSchemas, SupportedSorts, SupportedSortsEnum } from "@/utils/zod";
 
-import { prisma } from "../../database";
+import { prisma } from "../../remote/db/database";
 
 const getOrderBy = (sort: SupportedSorts) => {
   switch (sort) {
